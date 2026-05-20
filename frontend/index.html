@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rural Siksha - Empowering Rural Education</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Rural Siksha">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('Service Worker registered:', reg.scope);
+                    })
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login/Register Screen -->
+        <div id="authScreen" class="screen active">
+            <div class="auth-wrapper">
+                <div class="auth-left">
+                    <div class="brand-content">
+                        <div class="brand-logo">🎓</div>
+                        <h1>Rural Siksha</h1>
+                        <p class="tagline">Empowering Rural Education with AI</p>
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">📚</span>
+                                <div>
+                                    <h4>NCERT Resources</h4>
+                                    <p>Access curriculum for grades 1-10</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📝</span>
+                                <div>
+                                    <h4>Interactive Quizzes</h4>
+                                    <p>Test knowledge with instant feedback</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🤖</span>
+                                <div>
+                                    <h4>AI Tutor</h4>
+                                    <p>Get instant answers anytime</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📡</span>
+                                <div>
+                                    <h4>Works Offline</h4>
+                                    <p>Learn without internet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-right">
+                    <div class="auth-container">
+                        <div class="auth-tabs">
+                            <button class="tab-btn active" data-tab="login">Sign In</button>
+                            <button class="tab-btn" data-tab="register">Sign Up</button>
+                        </div>
+
+                        <div id="loginTab" class="auth-tab active">
+                            <h2>Welcome Back!</h2>
+                            <p class="subtitle">Login to continue learning</p>
+                            <form id="loginForm">
+                                <div class="form-group">
+                                    <label for="loginEmail">Email Address</label>
+                                    <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="loginPassword">Password</label>
+                                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-large">Login</button>
+                                <p id="loginError" class="error"></p>
+                                <div class="demo-info">
+                                    <p><strong>Try demo accounts:</strong></p>
+                                    <p>Student: student@example.com / password123</p>
+                                    <p>Teacher: teacher@example.com / password123</p>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="registerTab" class="auth-tab">
+                            <h2>Create Account</h2>
+                            <p class="subtitle">Join thousands of learners</p>
+                            <div class="role-selector">
+                                <div class="role-options">
+                                    <button type="button" class="role-btn active" data-role="student">
+                                        <span class="role-icon">👨‍🎓</span>
+                                        <span>Student</span>
+                                    </button>
+                                    <button type="button" class="role-btn" data-role="teacher">
+                                        <span class="role-icon">👨‍🏫</span>
+                                        <span>Teacher</span>
+                                    </button>
+                                    <button type="button" class="role-btn" data-role="parent">
+                                        <span class="role-icon">👨‍👩‍👧</span>
+                                        <span>Parent</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <form id="registerForm">
+                                <div class="form-group">
+                                    <label for="regEmail">Email</label>
+                                    <input type="email" id="regEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regFullName">Full Name</label>
+                                    <input type="text" id="regFullName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regPassword">Password</label>
+                                    <input type="password" id="regPassword" placeholder="Min 6 characters" required>
+                                </div>
+
+                                <div id="studentFields" class="form-group">
+                                    <label for="regGrade">Grade Level</label>
+                                    <select id="regGrade">
+                                        <option value="">Select Your Grade</option>
+                                        <option value="1">Grade 1</option>
+                                        <option value="2">Grade 2</option>
+                                        <option value="3">Grade 3</option>
+                                        <option value="4">Grade 4</option>
+                                        <option value="5">Grade 5</option>
+                                        <option value="6">Grade 6</option>
+                                        <option value="7">Grade 7</option>
+                                        <option value="8">Grade 8</option>
+                                        <option value="9">Grade 9</option>
+                                        <option value="10">Grade 10</option>
+                                    </select>
+                                </div>
+
+                                <div id="teacherFields" class="form-group hidden">
+                                    <label for="regSubject">Teaching Subject</label>
+                                    <select id="regSubject">
+                                        <option value="">Select Subject</option>
+                                        <option value="Mathematics">Mathematics</option>
+                                        <option value="Science">Science</option>
+                                        <option value="English">English</option>
+                                        <option value="Social Studies">Social Studies</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Kannada">Kannada</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-large">Create Account</button>
+                                <p id="regError" class="error"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen">
+            <!-- Offline Indicator Banner -->
+            <div id="offlineBanner" class="offline-banner hidden">
+                <span class="offline-icon">📡</span>
+                <span>You are offline - Using cached content. Changes will sync when online.</span>
+            </div>
+
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="brand-icon">🎓</span>
+                    <h2>Rural Siksha</h2>
+                    <span id="connectionStatus" class="connection-status online" title="Online">🟢</span>
+                </div>
+                <div class="navbar-menu">
+                    <!-- Parent-only Dashboard button (hidden by default) -->
+                    <button id="parentDashBtn" class="nav-btn nav-btn-highlight" style="display:none">
+                        <span class="nav-icon">👨‍👩‍👧</span>
+                        <span class="nav-label">Parent Dashboard</span>
+                    </button>
+                    <!-- Teacher-only Dashboard button (hidden by default) -->
+                    <button id="teacherDashBtn" class="nav-btn nav-btn-highlight" style="display:none">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span class="nav-label">Teacher Home</span>
+                    </button>
+                    <button id="homeBtn" class="nav-btn active">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Home</span>
+                    </button>
+                    <button id="resourcesBtn" class="nav-btn">
+                        <span class="nav-icon">📚</span>
+                        <span class="nav-label">Resources</span>
+                    </button>
+                    <button id="quizzesBtn" class="nav-btn">
+                        <span class="nav-icon">📝</span>
+                        <span class="nav-label">Quizzes</span>
+                    </button>
+                    <button id="aiTutorBtn" class="nav-btn nav-btn-highlight">
+                        <span class="nav-icon">🤖</span>
+                        <span class="nav-label">AI Tutor</span>
+                    </button>
+                    <button id="papersBtn" class="nav-btn">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-label">Papers</span>
+                    </button>
+                    <button id="toolsBtn" class="nav-btn">
+                        <span class="nav-icon">🧮</span>
+                        <span class="nav-label">Tools</span>
+                    </button>
+                    <!-- Hidden buttons - accessed via Home page -->
+                    <button id="careerBtn" class="nav-btn hidden" style="display:none">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-label">Career</span>
+                    </button>
+                    <button id="doubtsBtn" class="nav-btn hidden" style="display:none">
+                        <span class="nav-icon">💭</span>
+                        <span class="nav-label">Doubts</span>
+                    </button>
+                    <button id="progressBtn" class="nav-btn hidden" style="display:none">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Progress</span>
+                    </button>
+                </div>
+                <div class="navbar-user">
+                    <div id="gradeSelector" class="grade-selector hidden">
+                        <label for="viewingGrade">📖 Viewing Grade:</label>
+                        <select id="viewingGrade">
+                            <option value="1">Grade 1</option>
+                            <option value="2">Grade 2</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                            <option value="7">Grade 7</option>
+                            <option value="8">Grade 8</option>
+                            <option value="9">Grade 9</option>
+                            <option value="10">Grade 10</option>
+                        </select>
+                    </div>
+                    <span id="userInfo" class="user-info"></span>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+            </nav>
+
+            <div class="dashboard-container">
+                <!-- HOME DASHBOARD PANEL -->
+                <div id="homePanel" class="panel active">
+                    <div class="welcome-banner">
+                        <h1>Welcome to Rural Siksha! 👋</h1>
+                        <p id="welcomeMessage">Your complete learning platform with NCERT resources, quizzes, and AI tutor</p>
+                    </div>
+
+                    <h2 class="section-title">📊 Your Learning Stats</h2>
+                    <div class="stats-grid" id="dashboardStats">
+                        <div class="stat-card math">
+                            <div class="stat-card-icon">📐</div>
+                            <div class="stat-card-number" id="totalResources">0</div>
+                            <div class="stat-card-label">Total Resources</div>
+                        </div>
+                        <div class="stat-card science">
+                            <div class="stat-card-icon">📝</div>
+                            <div class="stat-card-number" id="totalQuizzes">0</div>
+                            <div class="stat-card-label">Available Quizzes</div>
+                        </div>
+                        <div class="stat-card english">
+                            <div class="stat-card-icon">📄</div>
+                            <div class="stat-card-number" id="totalPapers">0</div>
+                            <div class="stat-card-label">Question Papers</div>
+                        </div>
+                        <div class="stat-card social">
+                            <div class="stat-card-icon">🎯</div>
+                            <div class="stat-card-number" id="totalCompleted">0</div>
+                            <div class="stat-card-label">Quizzes Completed</div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">🚀 Quick Actions</h2>
+                    <div class="quick-actions">
+                        <a class="quick-action" onclick="document.getElementById('resourcesBtn').click()">
+                            <span class="qa-icon">📚</span>
+                            <div class="qa-title">Study Resources</div>
+                            <div class="qa-subtitle">NCERT chapters & notes</div>
+                        </a>
+                        <a class="quick-action" onclick="document.getElementById('quizzesBtn').click()">
+                            <span class="qa-icon">📝</span>
+                            <div class="qa-title">Take Quiz</div>
+                            <div class="qa-subtitle">Test your knowledge</div>
+                        </a>
+                        <a class="quick-action" onclick="document.getElementById('aiTutorBtn').click()">
+                            <span class="qa-icon">🤖</span>
+                            <div class="qa-title">Ask AI Tutor</div>
+                            <div class="qa-subtitle">Get instant help</div>
+                        </a>
+                        <a class="quick-action" onclick="document.getElementById('papersBtn').click()">
+                            <span class="qa-icon">📄</span>
+                            <div class="qa-title">Practice Papers</div>
+                            <div class="qa-subtitle">Previous year papers</div>
+                        </a>
+                        <a class="quick-action" onclick="document.getElementById('toolsBtn').click()">
+                            <span class="qa-icon">🧮</span>
+                            <div class="qa-title">Study Tools</div>
+                            <div class="qa-subtitle">Calculator, formulas</div>
+                        </a>
+                    </div>
+
+                    <h2 class="section-title">🌟 More Features</h2>
+                    <div class="quick-actions">
+                        <a class="quick-action feature-card-career" onclick="goToPanel('careerPanel')">
+                            <span class="qa-icon">🎯</span>
+                            <div class="qa-title">Career Development</div>
+                            <div class="qa-subtitle">Explore careers, scholarships & skills</div>
+                        </a>
+                        <a class="quick-action feature-card-doubts" onclick="goToPanel('doubtsPanel')">
+                            <span class="qa-icon">💭</span>
+                            <div class="qa-title">Doubt Session</div>
+                            <div class="qa-subtitle">Save & track your questions</div>
+                        </a>
+                        <a class="quick-action feature-card-progress" onclick="goToPanel('progressPanel')">
+                            <span class="qa-icon">📊</span>
+                            <div class="qa-title">My Progress</div>
+                            <div class="qa-subtitle">Track your learning journey</div>
+                        </a>
+                    </div>
+
+                    <h2 class="section-title">📚 Subjects</h2>
+                    <div class="quick-actions">
+                        <a class="quick-action" onclick="filterBySubject('Mathematics')">
+                            <span class="qa-icon">📐</span>
+                            <div class="qa-title">Mathematics</div>
+                            <div class="qa-subtitle">Numbers, algebra, geometry</div>
+                        </a>
+                        <a class="quick-action" onclick="filterBySubject('Science')">
+                            <span class="qa-icon">🔬</span>
+                            <div class="qa-title">Science</div>
+                            <div class="qa-subtitle">Physics, chemistry, biology</div>
+                        </a>
+                        <a class="quick-action" onclick="filterBySubject('English')">
+                            <span class="qa-icon">📖</span>
+                            <div class="qa-title">English</div>
+                            <div class="qa-subtitle">Grammar & literature</div>
+                        </a>
+                        <a class="quick-action" onclick="filterBySubject('Social Studies')">
+                            <span class="qa-icon">🌍</span>
+                            <div class="qa-title">Social Studies</div>
+                            <div class="qa-subtitle">History & geography</div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resources Panel -->
+                <div id="resourcesPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>📚 Learning Resources</h2>
+                            <p class="panel-subtitle">NCERT-aligned study materials for your grade</p>
+                        </div>
+                        <button id="uploadResourceBtn" class="btn btn-primary hidden">+ Upload Resource</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="subjectFilter" class="filter-select">
+                            <option value="">All Subjects</option>
+                            <option value="Mathematics">📐 Mathematics</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="English">📖 English</option>
+                            <option value="Social Studies">🌍 Social Studies</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                            <option value="Kannada">🅺 Kannada</option>
+                        </select>
+                        <button id="refreshResources" class="btn btn-secondary">🔄 Refresh</button>
+                        <button id="saveOfflineBtn" onclick="saveAllForOffline()" class="btn btn-primary" title="Pre-download all PDFs for offline use">💾 Save All for Offline</button>
+                    </div>
+
+                    <div class="offline-info-banner">
+                        <span>📡 <strong>What works offline:</strong> Built-in PDFs, AI Tutor (with Ollama), Quizzes, Resources (after first load). <strong>Needs internet:</strong> NCERT website links, YouTube videos.</span>
+                    </div>
+
+                    <div id="uploadResourceForm" class="upload-form hidden">
+                        <h3>Upload New Resource</h3>
+                        <form id="resourceUploadForm">
+                            <input type="text" id="uploadTitle" placeholder="Title" required>
+                            <textarea id="uploadDescription" placeholder="Description" rows="2"></textarea>
+                            <div class="form-row">
+                                <select id="uploadSubject" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Science">Science</option>
+                                    <option value="English">English</option>
+                                    <option value="Social Studies">Social Studies</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Kannada">Kannada</option>
+                                </select>
+                                <select id="uploadGrade" required>
+                                    <option value="">Select Grade</option>
+                                    <option value="1">Grade 1</option><option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option><option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option><option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option><option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                                </select>
+                            </div>
+                            <input type="file" id="uploadFile" required>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                                <button type="button" id="cancelUpload" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="resourcesList" class="card-grid">
+                        <p class="loading-text">Loading resources...</p>
+                    </div>
+                </div>
+
+                <!-- Quizzes Panel -->
+                <div id="quizzesPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>📝 Quizzes</h2>
+                            <p class="panel-subtitle">Test your knowledge with NCERT-aligned quizzes</p>
+                        </div>
+                        <button id="createQuizBtn" class="btn btn-primary hidden">+ Create Quiz</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="quizSubjectFilter" class="filter-select">
+                            <option value="">All Subjects</option>
+                            <option value="Mathematics">📐 Mathematics</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="English">📖 English</option>
+                            <option value="Social Studies">🌍 Social Studies</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                            <option value="Kannada">🅺 Kannada</option>
+                        </select>
+                        <button id="refreshQuizzes" class="btn btn-secondary">🔄 Refresh</button>
+                    </div>
+
+                    <div id="quizListView">
+                        <div id="quizList" class="card-grid">
+                            <p class="loading-text">Loading quizzes...</p>
+                        </div>
+                    </div>
+
+                    <div id="quizTakingView" class="hidden quiz-container">
+                        <div class="quiz-header">
+                            <div>
+                                <h3 id="quizTitle"></h3>
+                                <p id="quizProgress" class="quiz-progress-text"></p>
+                            </div>
+                        </div>
+                        <div id="quizQuestions"></div>
+                        <div class="quiz-actions">
+                            <button id="submitQuizBtn" class="btn btn-primary">✓ Submit Quiz</button>
+                            <button id="cancelQuizBtn" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div id="quizResultsView" class="hidden quiz-container">
+                        <div id="quizResults"></div>
+                        <button id="backToQuizzesBtn" class="btn btn-primary">← Back to Quizzes</button>
+                    </div>
+
+                    <div id="quizCreateView" class="hidden quiz-container">
+                        <h3>Create New Quiz</h3>
+                        <form id="createQuizForm">
+                            <input type="text" id="quizTitleInput" placeholder="Quiz Title" required>
+                            <textarea id="quizDescriptionInput" placeholder="Description" rows="2"></textarea>
+                            <div class="form-row">
+                                <select id="quizSubjectInput" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Science">Science</option>
+                                    <option value="English">English</option>
+                                    <option value="Social Studies">Social Studies</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Kannada">Kannada</option>
+                                </select>
+                                <select id="quizGradeInput" required>
+                                    <option value="">Select Grade</option>
+                                    <option value="1">Grade 1</option><option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option><option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option><option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option><option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                                </select>
+                                <input type="number" id="quizTimeLimitInput" placeholder="Time limit (min)" min="1">
+                            </div>
+
+                            <h4>Questions</h4>
+                            <div id="questionsContainer"></div>
+                            <button type="button" id="addQuestionBtn" class="btn btn-secondary">+ Add Question</button>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Create Quiz</button>
+                                <button type="button" id="cancelCreateQuizBtn" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- AI TUTOR PANEL - Chat-like interface -->
+                <div id="aiTutorPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>🤖 AI Tutor - Your Personal Helper</h2>
+                            <p class="panel-subtitle">Ask any question and get instant explanations powered by AI</p>
+                        </div>
+                    </div>
+
+                    <div id="aiStatusBannerTutor" class="ai-status-banner"></div>
+
+                    <div class="ai-tutor-container">
+                        <div class="ai-chat-area" id="aiChatArea">
+                            <div class="ai-welcome">
+                                <div class="ai-avatar">🤖</div>
+                                <div class="ai-message">
+                                    <p><strong>Hello! I'm your AI Tutor.</strong></p>
+                                    <p>I can help you understand any topic from your NCERT curriculum. Try asking me:</p>
+                                    <ul>
+                                        <li>📐 "What is multiplication?"</li>
+                                        <li>🔬 "Explain photosynthesis"</li>
+                                        <li>📖 "What is a noun?"</li>
+                                        <li>🌍 "Tell me about India's freedom struggle"</li>
+                                        <li>🧮 "How do I solve 2x + 5 = 15?"</li>
+                                    </ul>
+                                    <p>Type your question below to get started! ⬇️</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ai-input-area">
+                            <form id="aiTutorForm">
+                                <div class="ai-input-row">
+                                    <select id="aiSubject" class="ai-subject-select">
+                                        <option value="">📚 Pick subject</option>
+                                        <option value="Mathematics">📐 Math</option>
+                                        <option value="Science">🔬 Science</option>
+                                        <option value="English">📖 English</option>
+                                        <option value="Social Studies">🌍 Social</option>
+                                    </select>
+                                    <input type="text" id="aiQuestion" placeholder="Ask me anything..." required>
+                                    <button type="submit" id="aiSubmitBtn" class="btn btn-primary">
+                                        <span id="aiSendIcon">📨 Ask</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUESTION PAPERS PANEL -->
+                <div id="papersPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>📄 Previous Year Question Papers</h2>
+                            <p class="panel-subtitle">Practice with previous year exam papers</p>
+                        </div>
+                        <button id="uploadPaperBtn" class="btn btn-primary hidden">+ Upload Paper</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="paperSubjectFilter" class="filter-select">
+                            <option value="">All Subjects</option>
+                            <option value="Mathematics">📐 Mathematics</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="English">📖 English</option>
+                            <option value="Social Studies">🌍 Social Studies</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                            <option value="Kannada">🅺 Kannada</option>
+                        </select>
+                        <select id="paperYearFilter" class="filter-select">
+                            <option value="">All Years</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                        </select>
+                        <select id="paperTypeFilter" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="annual">Annual Exam</option>
+                            <option value="half_yearly">Half Yearly</option>
+                            <option value="board">Board Exam</option>
+                            <option value="unit_test">Unit Test</option>
+                        </select>
+                        <button id="refreshPapers" class="btn btn-secondary">🔄 Refresh</button>
+                    </div>
+
+                    <div id="papersList" class="card-grid">
+                        <p class="loading-text">Loading question papers...</p>
+                    </div>
+                </div>
+
+                <!-- TOOLS PANEL -->
+                <div id="toolsPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>🧮 Study Tools</h2>
+                            <p class="panel-subtitle">Calculator, formulas, periodic table & more</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-tabs">
+                        <button id="tool-calculator-btn" class="tool-tab-btn active" onclick="switchTool('calculator')">🧮 Calculator</button>
+                        <button id="tool-formulas-btn" class="tool-tab-btn" onclick="switchTool('formulas')">📐 Formula Sheet</button>
+                        <button id="tool-periodic-btn" class="tool-tab-btn" onclick="switchTool('periodic')">⚛️ Periodic Table</button>
+                        <button id="tool-converter-btn" class="tool-tab-btn" onclick="switchTool('converter')">📏 Unit Converter</button>
+                    </div>
+
+                    <div id="toolContent" class="tool-content">
+                        <p class="loading-text">Loading tools...</p>
+                    </div>
+                </div>
+
+                <!-- CAREER PANEL -->
+                <div id="careerPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>🎯 Career Guidance & Skills</h2>
+                            <p class="panel-subtitle">Plan your future - explore careers, scholarships, and skills</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-tabs">
+                        <button id="career-paths-btn" class="career-tab-btn active" onclick="switchCareerTab('paths')">💼 Career Paths</button>
+                        <button id="career-scholarships-btn" class="career-tab-btn" onclick="switchCareerTab('scholarships')">💰 Scholarships</button>
+                        <button id="career-skills-btn" class="career-tab-btn" onclick="switchCareerTab('skills')">🛠️ Skills</button>
+                    </div>
+
+                    <div id="careerContent" class="career-content">
+                        <p class="loading-text">Loading career info...</p>
+                    </div>
+                </div>
+
+                <!-- DOUBTS PANEL - Teacher review history -->
+                <div id="doubtsPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>💭 My Doubts</h2>
+                            <p class="panel-subtitle">Your saved questions and teacher's responses</p>
+                        </div>
+                    </div>
+
+                    <!-- Ask for teacher review -->
+                    <div id="askDoubtSection" class="ask-doubt-section">
+                        <h3>🙋 Request Teacher Help</h3>
+                        <p class="section-info">Have a question? Save it here for the teacher to review. The AI tutor will also try to answer.</p>
+
+                        <form id="doubtForm">
+                            <div class="form-group">
+                                <label for="doubtSubject">📚 Subject</label>
+                                <select id="doubtSubject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="Mathematics">📐 Mathematics</option>
+                                    <option value="Science">🔬 Science</option>
+                                    <option value="English">📖 English</option>
+                                    <option value="Social Studies">🌍 Social Studies</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                            <option value="Kannada">🅺 Kannada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="doubtQuestion">❓ Your Question</label>
+                                <textarea id="doubtQuestion" rows="4" placeholder="Type your detailed question here..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-large" id="submitDoubtBtn">
+                                💾 Save Doubt
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Doubts History -->
+                    <div class="doubts-history">
+                        <h3>📋 Your Saved Doubts</h3>
+                        <p class="section-info">All your previously asked questions and their answers</p>
+                        <div id="doubtsList" class="doubts-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">💡</div>
+                                <p>No doubts saved yet. Ask one above!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEACHER DASHBOARD PANEL -->
+                <div id="teacherPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>👨‍🏫 Teacher Dashboard</h2>
+                            <p class="panel-subtitle">Manage your classes, answer doubts, and create content</p>
+                        </div>
+                    </div>
+
+                    <div id="teacherContent">
+                        <p class="loading-text">Loading dashboard...</p>
+                    </div>
+                </div>
+
+                <!-- PARENT DASHBOARD PANEL -->
+                <div id="parentPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>👨‍👩‍👧 Parent Dashboard</h2>
+                            <p class="panel-subtitle">Track your child's education journey</p>
+                        </div>
+                    </div>
+
+                    <div id="parentContent">
+                        <p class="loading-text">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Progress Panel -->
+                <div id="progressPanel" class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>📊 Your Progress</h2>
+                            <p class="panel-subtitle">Track your learning journey</p>
+                        </div>
+                    </div>
+                    <div id="progressSummary" class="progress-summary">
+                        <p class="loading-text">Loading progress data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Container -->
+        <div id="modalContainer" class="modal-container hidden">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">×</button>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/offline.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/resources.js"></script>
+    <script src="/static/js/quizzes.js"></script>
+    <script src="/static/js/doubts.js"></script>
+    <script src="/static/js/ai-tutor.js"></script>
+    <script src="/static/js/papers.js"></script>
+    <script src="/static/js/tools.js"></script>
+    <script src="/static/js/career.js"></script>
+    <script src="/static/js/parent.js"></script>
+    <script src="/static/js/teacher.js"></script>
+    <script src="/static/js/progress.js"></script>
+    <script src="/static/js/home.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
