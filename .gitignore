@@ -53,3 +53,11 @@ htmlcov/
 
 # Logs
 *.log
+
+# Tunneling binaries (large, do not commit)
+cloudflared.exe
+ngrok.exe
+tunnel.log
+
+# Worktree from Claude Code
+.claude/worktrees/

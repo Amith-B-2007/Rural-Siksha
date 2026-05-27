@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rural Siksha - AI-powered NCERT education platform for rural India. Free, offline-capable, multi-language learning.">
+    <meta name="keywords" content="rural education, NCERT, AI tutor, offline learning, Indian education">
+    <meta name="author" content="Rural Siksha Team">
     <title>Rural Siksha - Empowering Rural Education</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234f46e5' rx='15'/><text x='50' y='65' text-anchor='middle' font-size='50'>🎓</text></svg>">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Rural Siksha">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         // Register Service Worker for offline support
         if ('serviceWorker' in navigator) {
@@ -22,10 +26,68 @@
                     .catch(err => console.log('Service Worker registration failed:', err));
             });
         }
+
+        // Robust career panel opener - always works
+        function openCareerPanel() {
+            console.log('Opening career panel...');
+
+            // Hide all panels
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+            // Show career panel
+            const panel = document.getElementById('careerPanel');
+            if (panel) panel.classList.add('active');
+
+            // Try to call showCareerPaths multiple times to ensure it works
+            let attempts = 0;
+            const tryLoad = () => {
+                attempts++;
+                if (typeof showCareerPaths === 'function') {
+                    try {
+                        showCareerPaths();
+                        console.log('Career paths loaded successfully');
+                    } catch (e) {
+                        console.error('Error in showCareerPaths:', e);
+                        renderCareerFallback();
+                    }
+                } else if (attempts < 5) {
+                    console.log('Waiting for showCareerPaths... attempt', attempts);
+                    setTimeout(tryLoad, 200);
+                } else {
+                    console.error('showCareerPaths not available');
+                    renderCareerFallback();
+                }
+            };
+            setTimeout(tryLoad, 100);
+
+            // Scroll to top
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Fallback if career.js fails to load
+        function renderCareerFallback() {
+            const container = document.getElementById('careerContent');
+            if (!container) return;
+            container.innerHTML = `
+                <div style="text-align:center; padding:40px;">
+                    <h2>🎯 Career Guidance</h2>
+                    <p style="color:#64748b; margin:20px 0;">Loading career data...</p>
+                    <button onclick="location.reload()" style="padding:10px 20px; background:linear-gradient(135deg,#4f46e5,#ec4899); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+                        🔄 Reload Page
+                    </button>
+                </div>
+            `;
+        }
     </script>
 </head>
 <body>
     <div id="app">
+        <!-- Global Offline Indicator Banner -->
+        <div id="offlineBanner" class="offline-banner hidden">
+            <span class="offline-icon">📡</span>
+            <span><strong>You are OFFLINE</strong> - Using cached content. Changes will sync when online.</span>
+        </div>
+
         <!-- Login/Register Screen -->
         <div id="authScreen" class="screen active">
             <div class="auth-wrapper">
@@ -171,12 +233,6 @@
 
         <!-- Dashboard Screen -->
         <div id="dashboardScreen" class="screen">
-            <!-- Offline Indicator Banner -->
-            <div id="offlineBanner" class="offline-banner hidden">
-                <span class="offline-icon">📡</span>
-                <span>You are offline - Using cached content. Changes will sync when online.</span>
-            </div>
-
             <nav class="navbar">
                 <div class="navbar-brand">
                     <span class="brand-icon">🎓</span>
@@ -233,6 +289,7 @@
                     </button>
                 </div>
                 <div class="navbar-user">
+                    <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
                     <div id="gradeSelector" class="grade-selector hidden">
                         <label for="viewingGrade">📖 Viewing Grade:</label>
                         <select id="viewingGrade">
@@ -259,7 +316,14 @@
                     <div class="welcome-banner">
                         <h1>Welcome to Rural Siksha! 👋</h1>
                         <p id="welcomeMessage">Your complete learning platform with NCERT resources, quizzes, and AI tutor</p>
+                        <div class="welcome-actions">
+                            <button onclick="startDemoTour()" class="welcome-btn">▶️ Take Demo Tour</button>
+                            <button onclick="showAboutPage()" class="welcome-btn">ℹ️ About Project</button>
+                            <button onclick="showAdaptiveLearning()" class="welcome-btn">🎯 Daily Goals</button>
+                        </div>
                     </div>
+
+                    <div id="gamificationContainer"></div>
 
                     <h2 class="section-title">📊 Your Learning Stats</h2>
                     <div class="stats-grid" id="dashboardStats">
@@ -316,11 +380,6 @@
 
                     <h2 class="section-title">🌟 More Features</h2>
                     <div class="quick-actions">
-                        <a class="quick-action feature-card-career" onclick="goToPanel('careerPanel')">
-                            <span class="qa-icon">🎯</span>
-                            <div class="qa-title">Career Development</div>
-                            <div class="qa-subtitle">Explore careers, scholarships & skills</div>
-                        </a>
                         <a class="quick-action feature-card-doubts" onclick="goToPanel('doubtsPanel')">
                             <span class="qa-icon">💭</span>
                             <div class="qa-title">Doubt Session</div>
@@ -330,6 +389,30 @@
                             <span class="qa-icon">📊</span>
                             <div class="qa-title">My Progress</div>
                             <div class="qa-subtitle">Track your learning journey</div>
+                        </a>
+                    </div>
+
+                    <h2 class="section-title">🎮 Fun & Games</h2>
+                    <div class="quick-actions">
+                        <a class="quick-action" onclick="showLeaderboard()">
+                            <span class="qa-icon">🏆</span>
+                            <div class="qa-title">Leaderboard</div>
+                            <div class="qa-subtitle">See top students</div>
+                        </a>
+                        <a class="quick-action" onclick="showGamesMenu()">
+                            <span class="qa-icon">🎮</span>
+                            <div class="qa-title">Educational Games</div>
+                            <div class="qa-subtitle">Math, Memory, Spelling</div>
+                        </a>
+                        <a class="quick-action" onclick="startQuickPractice()">
+                            <span class="qa-icon">🎲</span>
+                            <div class="qa-title">Quick Practice</div>
+                            <div class="qa-subtitle">Random question challenge</div>
+                        </a>
+                        <a class="quick-action" onclick="openMathScanner()">
+                            <span class="qa-icon">📷</span>
+                            <div class="qa-title">Math Scanner</div>
+                            <div class="qa-subtitle">Solve photo problems</div>
                         </a>
                     </div>
 
@@ -548,11 +631,22 @@
                                         <option value="Science">🔬 Science</option>
                                         <option value="English">📖 English</option>
                                         <option value="Social Studies">🌍 Social</option>
+                                        <option value="Hindi">🇮🇳 Hindi</option>
+                                        <option value="Kannada">🅺 Kannada</option>
                                     </select>
-                                    <input type="text" id="aiQuestion" placeholder="Ask me anything..." required>
+                                    <input type="text" id="aiQuestion" placeholder="Ask me anything or use 🎤..." required>
+                                    <select id="aiVoiceLang" style="display:none">
+                                        <option value="en-IN">English</option>
+                                        <option value="hi-IN">Hindi</option>
+                                        <option value="kn-IN">Kannada</option>
+                                    </select>
+                                    <button type="button" id="voiceBtn" onclick="toggleVoiceInput()" class="btn btn-secondary" title="Voice Input">🎤</button>
                                     <button type="submit" id="aiSubmitBtn" class="btn btn-primary">
                                         <span id="aiSendIcon">📨 Ask</span>
                                     </button>
+                                </div>
+                                <div id="voiceIndicator" style="display:none; text-align:center; margin-top:10px; color:var(--danger); font-weight:600;">
+                                    🔴 Listening... Speak now!
                                 </div>
                             </form>
                         </div>
@@ -633,9 +727,13 @@
                     </div>
 
                     <div class="tool-tabs">
-                        <button id="career-paths-btn" class="career-tab-btn active" onclick="switchCareerTab('paths')">💼 Career Paths</button>
+                        <button id="career-paths-btn" class="career-tab-btn active" onclick="switchCareerTab('paths')">💼 Careers</button>
+                        <button id="career-quiz-btn" class="career-tab-btn" onclick="switchCareerTab('quiz')">🧠 Find My Career</button>
+                        <button id="career-colleges-btn" class="career-tab-btn" onclick="switchCareerTab('colleges')">🏛️ Top Colleges</button>
+                        <button id="career-exams-btn" class="career-tab-btn" onclick="switchCareerTab('exams')">📅 Exam Calendar</button>
                         <button id="career-scholarships-btn" class="career-tab-btn" onclick="switchCareerTab('scholarships')">💰 Scholarships</button>
                         <button id="career-skills-btn" class="career-tab-btn" onclick="switchCareerTab('skills')">🛠️ Skills</button>
+                        <button id="career-stories-btn" class="career-tab-btn" onclick="switchCareerTab('stories')">🌟 Success Stories</button>
                     </div>
 
                     <div id="careerContent" class="career-content">
@@ -736,6 +834,46 @@
             </div>
         </div>
 
+            <!-- Pro Footer -->
+            <footer class="pro-footer">
+                <div class="pro-footer-grid">
+                    <div class="pro-footer-section">
+                        <h4>🎓 Rural Siksha</h4>
+                        <p>Empowering rural students with quality NCERT education through AI-powered learning, offline capabilities, and multi-language support.</p>
+                    </div>
+                    <div class="pro-footer-section">
+                        <h4>📚 Features</h4>
+                        <ul>
+                            <li>📖 NCERT Resources</li>
+                            <li>📝 Interactive Quizzes</li>
+                            <li>🤖 AI Tutor with Voice</li>
+                            <li>📷 Math Scanner</li>
+                            <li>🎮 Educational Games</li>
+                        </ul>
+                    </div>
+                    <div class="pro-footer-section">
+                        <h4>👥 For Everyone</h4>
+                        <ul>
+                            <li>👨‍🎓 Students</li>
+                            <li>👨‍🏫 Teachers</li>
+                            <li>👨‍👩‍👧 Parents</li>
+                        </ul>
+                    </div>
+                    <div class="pro-footer-section">
+                        <h4>🌐 Languages</h4>
+                        <ul>
+                            <li>English</li>
+                            <li>हिन्दी Hindi</li>
+                            <li>ಕನ್ನಡ Kannada</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pro-footer-bottom">
+                    <p>© 2026 Rural Siksha | Built with ❤️ for Rural India | 📡 Works Offline | 🔌 PWA Ready</p>
+                </div>
+            </footer>
+        </div>
+
         <!-- Modal Container -->
         <div id="modalContainer" class="modal-container hidden">
             <div class="modal-content">
@@ -747,6 +885,7 @@
 
     <script src="/static/js/api.js"></script>
     <script src="/static/js/utils.js"></script>
+    <script src="/static/js/pro-ui.js"></script>
     <script src="/static/js/offline.js"></script>
     <script src="/static/js/auth.js"></script>
     <script src="/static/js/resources.js"></script>
@@ -755,10 +894,27 @@
     <script src="/static/js/ai-tutor.js"></script>
     <script src="/static/js/papers.js"></script>
     <script src="/static/js/tools.js"></script>
-    <script src="/static/js/career.js"></script>
+    <!-- career.js removed -->
+    <!-- <script src="/static/js/career.js?v=24"></script> -->
+    <script>
+        // Stub function in case any code calls it
+        function openCareerPanel() {
+            console.log('Career feature removed');
+            if (typeof toast !== 'undefined') {
+                toast.info('Career feature has been removed');
+            }
+        }
+    </script>
     <script src="/static/js/parent.js"></script>
     <script src="/static/js/teacher.js"></script>
     <script src="/static/js/progress.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/gamification.js"></script>
+    <script src="/static/js/text-to-speech.js"></script>
+    <script src="/static/js/voice-scanner.js"></script>
+    <script src="/static/js/leaderboard.js"></script>
+    <script src="/static/js/practice-games.js"></script>
+    <script src="/static/js/winning-features.js"></script>
     <script src="/static/js/home.js"></script>
     <script src="/static/js/app.js"></script>
 </body>

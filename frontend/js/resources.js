@@ -85,6 +85,11 @@ function displayResources(resources) {
                 <button onclick="viewResource(${resource.id})" class="btn-view">📖 View PDF</button>
                 <button onclick="downloadResource(${resource.id})" class="btn-download">⬇️ Download</button>
             </div>
+            <div class="resource-actions" style="margin-top:8px;">
+                <button onclick="readResourceAloud(${resource.id}, '${resource.title.replace(/'/g, "\\'")}')" class="btn-tts">
+                    🔊 Read Aloud
+                </button>
+            </div>
             ${ncertBtn ? `<div class="resource-actions" style="margin-top:8px;">${ncertBtn}</div>` : ''}
             ${youtubeBtn ? `<div class="resource-actions" style="margin-top:8px;">${youtubeBtn}</div>` : ''}
         </div>
@@ -185,6 +190,11 @@ function getSubjectIcon(subject) {
 function viewResource(resourceId) {
     const resource = currentResources.find(r => r.id === resourceId);
     if (!resource) return;
+
+    // Track for gamification
+    if (typeof trackResourceViewed === 'function') {
+        trackResourceViewed(resource.subject);
+    }
 
     const pdfUrl = `/api/resources/${resourceId}/download`;
 

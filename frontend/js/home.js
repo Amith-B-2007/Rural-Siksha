@@ -16,6 +16,18 @@ async function loadHomeStats() {
         }
     }
 
+    // Render gamification stats for students
+    if (user.role === 'student') {
+        const gamifyContainer = document.getElementById('gamificationContainer');
+        if (gamifyContainer && typeof renderGamificationStats === 'function') {
+            gamifyContainer.innerHTML = renderGamificationStats();
+        }
+        // Track login
+        if (typeof trackLogin === 'function') {
+            trackLogin();
+        }
+    }
+
     try {
         const grade = typeof getCurrentViewingGrade === 'function' ? getCurrentViewingGrade() : user.gradeLevel;
 

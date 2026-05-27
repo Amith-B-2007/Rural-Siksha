@@ -236,12 +236,32 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
 
+    // Check periodically (every 10 seconds) for connection changes
+    setInterval(updateOnlineStatus, 10000);
+
     // Health check periodic
     setInterval(checkSystemHealth, 60000);
 });
 
-function updateOnlineStatus() {
-    const isOnline = navigator.onLine;
+let wasOnline = navigator.onLine;
+
+async function actuallyOnline() {
+    // Real online check by pinging server
+    try {
+        const response = await fetch('/api/health', {
+            method: 'GET',
+            cache: 'no-store',
+            signal: AbortSignal.timeout(3000)
+        });
+        return response.ok;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function updateOnlineStatus() {
+    // Use real check, not just navigator.onLine
+    const isOnline = navigator.onLine && await actuallyOnline();
     const banner = document.getElementById('offlineBanner');
     const indicator = document.getElementById('connectionStatus');
 
@@ -252,11 +272,19 @@ function updateOnlineStatus() {
             indicator.title = 'Online';
             indicator.className = 'connection-status online';
         }
-        console.log('Status: Online - syncing pending data');
-        // Try to sync pending data
-        if (typeof offlineDB !== 'undefined' && offlineDB.syncPending) {
-            offlineDB.syncPending().catch(err => console.warn('Sync failed:', err));
+        console.log('Status: Online');
+
+        // Notify user if just came back online
+        if (!wasOnline) {
+            if (typeof toast !== 'undefined') {
+                toast.success('🎉 You are back online! Syncing data...');
+            }
+            // Try to sync pending data
+            if (typeof offlineDB !== 'undefined' && offlineDB.syncPending) {
+                offlineDB.syncPending().catch(err => console.warn('Sync failed:', err));
+            }
         }
+        wasOnline = true;
     } else {
         if (banner) banner.classList.remove('hidden');
         if (indicator) {
@@ -265,6 +293,14 @@ function updateOnlineStatus() {
             indicator.className = 'connection-status offline';
         }
         console.log('Status: Offline - Using cached content');
+
+        // Notify user if just went offline
+        if (wasOnline) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('📡 You are now offline. Cached content available.');
+            }
+        }
+        wasOnline = false;
     }
 }
 

@@ -181,6 +181,11 @@ async function handleAiTutorSubmit(e) {
     // Add user message
     addChatMessage('user', question, subject);
 
+    // Track for gamification
+    if (typeof trackAIQuestion === 'function') {
+        trackAIQuestion();
+    }
+
     // Clear input
     document.getElementById('aiQuestion').value = '';
 

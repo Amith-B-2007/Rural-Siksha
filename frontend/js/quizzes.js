@@ -174,6 +174,12 @@ async function submitQuiz() {
 
     try {
         const result = await API.quizzes.submit(currentQuiz.id, currentAttempt.attempt_id, answersList);
+
+        // Track for gamification
+        if (typeof trackQuizCompleted === 'function') {
+            trackQuizCompleted(result.passed, result.percentage);
+        }
+
         displayQuizResults(result);
     } catch (error) {
         console.error('Failed to submit quiz:', error);

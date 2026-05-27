@@ -35,7 +35,7 @@ class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'sqlite:///./data/ruralsiksha.db'
+        'sqlite:///' + os.path.join(BASE_DIR, 'data', 'ruralsiksha.db')
     )
     SESSION_COOKIE_SECURE = True
 

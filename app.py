@@ -62,10 +62,43 @@ def create_app(config_name='development'):
         from backend import models
         db.create_all()
 
+        # Auto-seed demo data on cloud deploys (idempotent)
+        if os.getenv('SEED_DEMO_DATA') == '1':
+            try:
+                User = models.User
+                if User.query.count() == 0:
+                    demos = [
+                        ('Demo Student', 'student@example.com', 'student', 10, None),
+                        ('Demo Teacher', 'teacher@example.com', 'teacher', None, 'Mathematics'),
+                        ('Demo Parent',  'parent@example.com',  'parent',  None, None),
+                    ]
+                    for full_name, email, role, grade, subject in demos:
+                        u = User(email=email, full_name=full_name, role=role,
+                                 grade_level=grade, subject=subject)
+                        u.set_password('password123')
+                        db.session.add(u)
+                    db.session.commit()
+                    print('[seed] Demo accounts created.')
+            except Exception as e:
+                print(f'[seed] Skipped: {e}')
+
     return app
 
 
 if __name__ == '__main__':
     app = create_app(os.getenv('FLASK_ENV', 'development'))
-    # Disable reloader to avoid context issues
-    app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False)
+    # Listen on all interfaces (0.0.0.0) so mobile devices can access
+    print("\n" + "=" * 60)
+    print(" Rural Siksha - Starting Server")
+    print("=" * 60)
+    print(" Access on this computer: http://127.0.0.1:5000")
+    print(" Access from mobile (same WiFi):")
+    try:
+        import socket
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        print(f"   http://{local_ip}:5000")
+    except:
+        print("   http://YOUR_COMPUTER_IP:5000")
+    print("=" * 60 + "\n")
+    app.run(debug=False, host='0.0.0.0', port=5000, use_reloader=False)

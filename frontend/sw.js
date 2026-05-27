@@ -3,7 +3,7 @@
  * Provides offline support by caching app shell and API responses
  */
 
-const CACHE_VERSION = 'rural-siksha-v13';
+const CACHE_VERSION = 'rural-siksha-v25';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 const RESOURCE_CACHE = `${CACHE_VERSION}-resources`;
