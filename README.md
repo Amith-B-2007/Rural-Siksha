@@ -2,6 +2,20 @@
 
 An offline-first educational platform for rural schools (grades 1-10), featuring AI-powered tutoring via Ollama LLM.
 
+## Overview
+<div align="center">
+  <img src="docs/poster.jpg" alt="Rural Siksha Poster" width="800"/>
+</div>
+
+## Screenshots
+
+<div align="center">
+  <img src="docs/screenshot_1.png" alt="App Features" width="400"/>
+  <img src="docs/screenshot_2.png" alt="Sign Up Page" width="400"/>
+  <img src="docs/screenshot_3.png" alt="AI Tutor" width="400"/>
+  <img src="docs/screenshot_4.png" alt="Login Page" width="400"/>
+</div>
+
 ## Features
 
 - **Student Interface**
