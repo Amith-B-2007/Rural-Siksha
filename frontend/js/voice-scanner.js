@@ -172,20 +172,62 @@ function captureMathPhoto() {
 function uploadMathPhoto() {
     document.getElementById('mathPhotoInput').click();
 }
-
 function handlePhotoUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Show preview immediately
     const reader = new FileReader();
     reader.onload = (e) => {
-        const img = `<img src="${e.target.result}" style="max-width:100%; max-height:300px; border-radius:8px; margin: 15px 0;" alt="Math Problem">`;
-        const inputDiv = document.querySelector('.form-group');
+        const imgHtml = `<img id="mathPhotoPreview" src="${e.target.result}" style="max-width:100%; max-height:300px; border-radius:8px; margin: 15px 0;" alt="Math Problem">`;
+        const inputDiv = document.querySelector('.math-scanner .form-group');
         if (inputDiv) {
-            inputDiv.insertAdjacentHTML('beforebegin', `<div class="photo-preview">${img}<p style="text-align:center; color:var(--text-secondary); font-size:13px;">Photo captured! Now describe or type what you see below.</p></div>`);
+            const existing = document.querySelector('.photo-preview');
+            if (existing) existing.remove();
+            inputDiv.insertAdjacentHTML('beforebegin', `<div class="photo-preview">${imgHtml}<p id="photoStatus" style="text-align:center; color:var(--text-secondary); font-size:13px;">Photo captured!</p></div>`);
         }
+
+        // Start OCR after preview
+        runOCR(file);
     };
     reader.readAsDataURL(file);
+}
+
+async function runOCR(file) {
+    const statusEl = document.getElementById('photoStatus');
+    const mathInput = document.getElementById('mathProblemInput');
+
+    if (!window.Tesseract) {
+        if (statusEl) statusEl.textContent = 'OCR library not loaded — please ensure you are online. (You can still type the problem below manually!)';
+        return;
+    }
+
+    try {
+        if (statusEl) statusEl.textContent = 'Preparing OCR...';
+
+        const result = await Tesseract.recognize(file, 'eng', {
+            logger: m => {
+                // Update status based on logger messages
+                if (!statusEl) return;
+                if (m.status === 'recognizing text') {
+                    statusEl.textContent = `Recognizing text... ${(m.progress * 100).toFixed(0)}%`;
+                } else if (m.status === 'downloading') {
+                    statusEl.textContent = `Downloading OCR data... ${(m.progress * 100).toFixed(0)}%`;
+                } else {
+                    statusEl.textContent = m.status;
+                }
+            }
+        });
+
+        const text = (result && result.data && result.data.text) ? result.data.text.trim() : '';
+        if (statusEl) statusEl.textContent = text ? 'OCR complete — text populated below.' : 'No text detected — please type the problem.';
+        if (mathInput) mathInput.value = text || '';
+    } catch (err) {
+        console.error('OCR error:', err);
+        if (statusEl) {
+            statusEl.textContent = 'OCR failed — ensure you are online and try again.';
+        }
+    }
 }
 
 async function solveMathProblem() {

@@ -27,11 +27,13 @@ const API = {
             config.body = JSON.stringify(data);
         }
 
+        const requestTimeout = options.timeout || this.timeout;
+
         try {
             const response = await Promise.race([
                 fetch(url, config),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Request timeout')), this.timeout)
+                    setTimeout(() => reject(new Error('Request timeout')), requestTimeout)
                 )
             ]);
 
@@ -144,13 +146,13 @@ const API = {
 
     // Doubt endpoints
     doubts: {
-        create: (questionText, questionDetail, subject, gradeLevel) =>
+        create: (questionText, questionDetail, subject, gradeLevel, options = { timeout: 90000 }) =>
             API.request('POST', '/doubts', {
                 question_text: questionText,
                 question_detail: questionDetail,
                 subject,
                 grade_level: gradeLevel
-            }),
+            }, options),
         list: (status = null) => {
             let endpoint = '/doubts';
             if (status) endpoint += `?status=${status}`;
